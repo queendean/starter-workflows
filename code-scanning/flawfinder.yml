@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Kubesec
+name: flawfinder
 
 on:
   push:
@@ -15,9 +15,9 @@ on:
     - cron: $cron-weekly
 
 jobs:
-  lint:
-    name: Kubesec
-    runs-on: ubuntu-20.04
+  flawfinder:
+    name: Flawfinder
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
@@ -26,16 +26,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run kubesec scanner
-        uses: controlplaneio/kubesec-action@43d0ddff5ffee89a6bb9f29b64cd865411137b14
+      - name: flawfinder_scan
+        uses: david-a-wheeler/flawfinder@8e4a779ad59dbfaee5da586aa9210853b701959c
         with:
-          input: file.yaml # specify configuration file to scan here
-          format: template
-          template: template/sarif.tpl
-          output: kubesec-results.sarif
-          exit-code: "0"
+          arguments: '--sarif ./'
+          output: 'flawfinder_results.sarif'
 
-      - name: Upload Kubesec scan results to GitHub Security tab
+      - name: Upload analysis results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: kubesec-results.sarif
+          sarif_file: ${{github.workspace}}/flawfinder_results.sarif
